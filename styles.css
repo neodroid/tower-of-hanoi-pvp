@@ -249,4 +249,45 @@ h1 {
 .hidden {
     display: none;
 }
+
+#celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+#celebration.hidden {
+    display: none;
+}
+
+#congrats-message {
+    color: #FFD700; /* Gold color */
+    font-size: 4em;
+    text-align: center;
+    animation: zoomIn 0.5s, pulse 1s infinite;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Keyframes for zoom-in effect */
+@keyframes zoomIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Confetti canvas styles if needed */
+/* ... you can add custom styles for the confetti ... */
  

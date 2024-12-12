@@ -192,12 +192,12 @@ function initializeGame() {
         const redBlocks = redWinTower.querySelectorAll('.red-block');
 
         if (blueBlocks.length === numBlocks) {
-            alert('Blue player wins! 🎉');
-            resetGame();
+            showCelebration('🎉 Blue Player Wins! 🎉');
+            return;
         }
         if (redBlocks.length === numBlocks) {
-            alert('Red player wins! 🎉');
-            resetGame();
+            showCelebration('🎉 Red Player Wins! 🎉');
+            return;
         }
     }
 
@@ -222,6 +222,52 @@ function initializeGame() {
         messageBox.hideTimeout = setTimeout(() => {
             messageBox.classList.remove('show');
         }, 3000); // Message displays for 3 seconds
+    }
+
+    function showCelebration(message) {
+        // Play win sound
+        const winSound = document.getElementById('win-sound');
+        winSound.play();
+
+        // Show celebration overlay
+        const celebration = document.getElementById('celebration');
+        const congratsMessage = document.getElementById('congrats-message');
+        congratsMessage.textContent = message;
+        celebration.classList.remove('hidden');
+
+        // Start confetti animation
+        startConfetti();
+
+        // After some time, reset the game
+        setTimeout(() => {
+            stopConfetti();
+            celebration.classList.add('hidden');
+            resetGame();
+        }, 5000); // Celebration lasts 5 seconds
+    }
+
+    // Add functions for confetti animation
+    function startConfetti() {
+        // Using canvas-confetti library
+        const duration = 5 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 };
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+            // Since particles fall down, start a bit higher than random
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+        }, 250);
+    }
+
+    function stopConfetti() {
+        // Confetti stops automatically after duration
     }
 
     // Initial positioning of blocks
