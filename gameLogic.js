@@ -33,6 +33,7 @@ function initializeGame() {
         if ((currentPlayer === 'blue' && !isBlueBlock) || 
             (currentPlayer === 'red' && isBlueBlock)) {
             event.preventDefault();
+            alert('It is not your turn!');
             return;
         }
 
@@ -42,6 +43,7 @@ function initializeGame() {
 
         if (block !== topBlock) {
             event.preventDefault();
+            alert('You can only move the top block on a tower!');
             return;
         }
 
@@ -124,17 +126,26 @@ function initializeGame() {
         const topBlockSize = topBlockOnTargetTower ? 
             parseInt(topBlockOnTargetTower.getAttribute('data-size')) : Infinity;
 
-        // Check basic Hanoi rules
-        if (draggedBlockSize >= topBlockSize) return false;
-
         const blockColor = draggedBlock.classList.contains('blue-block') ? 'blue' : 'red';
         const towerId = targetTower.id;
 
+        // Check basic Hanoi rules
+        if (draggedBlockSize > topBlockSize) {
+            alert('You cannot place a larger block on top of a smaller one!');
+            return false;
+        }
+        if (draggedBlockSize === topBlockSize && topBlockOnTargetTower) {
+            alert('You cannot place a block of the same size on top of another block of the same size!');
+            return false;
+        }
+
         // Check territory rules
         if (blockColor === 'blue' && !towerId.includes('blue') && !towerId.includes('middle')) {
+            alert('Blue blocks can only move to middle towers or blue towers!');
             return false;
         }
         if (blockColor === 'red' && !towerId.includes('red') && !towerId.includes('middle')) {
+            alert('Red blocks can only move to middle towers or red towers!');
             return false;
         }
 
@@ -200,6 +211,17 @@ function initializeGame() {
     function updateTurnIndicator() {
         turnIndicator.textContent = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)} Player's Turn`;
         turnIndicator.className = currentPlayer === 'blue' ? 'blue-turn' : 'red-turn';
+    }
+
+    function showMessage(text) {
+        const messageBox = document.getElementById('message-box');
+        messageBox.textContent = text;
+        messageBox.classList.add('show');
+        messageBox.classList.remove('hidden');
+        clearTimeout(messageBox.hideTimeout);
+        messageBox.hideTimeout = setTimeout(() => {
+            messageBox.classList.remove('show');
+        }, 3000); // Message displays for 3 seconds
     }
 
     // Initial positioning of blocks
