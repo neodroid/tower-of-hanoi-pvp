@@ -4,22 +4,24 @@ function initializeGame() {
     const turnIndicator = document.getElementById('turn-indicator');
     let draggedBlock = null;
     let currentPlayer = 'blue';
+    let moveHistory = [];
 
     // Show turn indicator
     turnIndicator.style.display = 'block';
     updateTurnIndicator();
 
+    // Record initial state
+    recordGameState();
+
     blocks.forEach(block => {
         block.addEventListener('dragstart', dragStart);
         block.addEventListener('dragend', dragEnd);
-        // Make sure blocks are draggable
         block.draggable = true;
     });
 
     towers.forEach(tower => {
         tower.addEventListener('dragover', dragOver);
         tower.addEventListener('drop', drop);
-        // Add dragenter to prevent default
         tower.addEventListener('dragenter', (e) => e.preventDefault());
     });
 
@@ -44,7 +46,6 @@ function initializeGame() {
         }
 
         draggedBlock = block;
-        // Set the drag data
         event.dataTransfer.effectAllowed = 'move';
         event.dataTransfer.setData('text/plain', '');
     }
@@ -66,11 +67,54 @@ function initializeGame() {
 
         moveBlock(targetTower);
         
-        // Switch turns and update indicator
         currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
         updateTurnIndicator();
         
         checkWinCondition();
+    }
+
+    function getGameState() {
+        const state = {};
+        towers.forEach(tower => {
+            state[tower.id] = Array.from(tower.querySelectorAll('.block')).map(block => ({
+                color: block.classList.contains('blue-block') ? 'blue' : 'red',
+                size: parseInt(block.getAttribute('data-size'))
+            }));
+        });
+        return {
+            boardState: state,
+            currentPlayer: currentPlayer
+        };
+    }
+
+    function recordGameState() {
+        const state = getGameState();
+        moveHistory.push(JSON.stringify(state));
+    }
+
+    function isRepeatedState(targetTower) {
+        // Create a temporary state to check
+        const tempState = getGameState();
+        const sourceTowerId = draggedBlock.parentElement.id;
+        const blockData = {
+            color: draggedBlock.classList.contains('blue-block') ? 'blue' : 'red',
+            size: parseInt(draggedBlock.getAttribute('data-size'))
+        };
+
+        // Remove block from source tower
+        tempState.boardState[sourceTowerId] = tempState.boardState[sourceTowerId]
+            .filter(block => !(block.color === blockData.color && block.size === blockData.size));
+
+        // Add block to target tower
+        if (!tempState.boardState[targetTower.id]) {
+            tempState.boardState[targetTower.id] = [];
+        }
+        tempState.boardState[targetTower.id].push(blockData);
+        tempState.boardState[targetTower.id].sort((a, b) => b.size - a.size);
+
+        // Check if this state exists in history
+        const stateString = JSON.stringify(tempState);
+        return moveHistory.includes(stateString);
     }
 
     function isValidMove(targetTower) {
@@ -80,17 +124,23 @@ function initializeGame() {
         const topBlockSize = topBlockOnTargetTower ? 
             parseInt(topBlockOnTargetTower.getAttribute('data-size')) : Infinity;
 
+        // Check basic Hanoi rules
         if (draggedBlockSize >= topBlockSize) return false;
 
         const blockColor = draggedBlock.classList.contains('blue-block') ? 'blue' : 'red';
         const towerId = targetTower.id;
 
-        // Blue can only move to blue towers or middle towers
+        // Check territory rules
         if (blockColor === 'blue' && !towerId.includes('blue') && !towerId.includes('middle')) {
             return false;
         }
-        // Red can only move to red towers or middle towers
         if (blockColor === 'red' && !towerId.includes('red') && !towerId.includes('middle')) {
+            return false;
+        }
+
+        // Check for repeated state
+        if (isRepeatedState(targetTower)) {
+            alert('This move would repeat a previous position!');
             return false;
         }
 
@@ -103,6 +153,7 @@ function initializeGame() {
         targetTower.appendChild(draggedBlock);
         updateBlockPositions(oldTower);
         updateBlockPositions(targetTower);
+        recordGameState();
         draggedBlock = null;
     }
 
@@ -112,12 +163,10 @@ function initializeGame() {
         
         blocks.forEach((block, index) => {
             if (isStartTower) {
-                // For start towers, build up from bottom, so smaller blocks are on top
                 const reversedIndex = blocks.length - 1 - index;
                 block.style.top = (50 + (35 * reversedIndex)) + 'px';
                 block.style.bottom = 'auto';
             } else {
-                // For target towers, build up from bottom
                 block.style.bottom = (50 + (35 * index)) + 'px';
                 block.style.top = 'auto';
             }
@@ -142,6 +191,7 @@ function initializeGame() {
     }
 
     function resetGame() {
+        moveHistory = [];
         document.getElementById('game-board').style.display = 'none';
         document.getElementById('setup').style.display = 'block';
         document.getElementById('turn-indicator').style.display = 'none';
@@ -156,4 +206,4 @@ function initializeGame() {
     towers.forEach(tower => {
         updateBlockPositions(tower);
     });
-} 
+}
