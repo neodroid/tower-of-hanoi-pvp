@@ -10,13 +10,42 @@
     <h1>🏰 PvP Tower of Hanoi 🏰</h1>
     <div id="turn-indicator">Blue Player's Turn</div>
     <div id="setup">
-        <label for="numMiddleTowers">Number of Middle Towers (minimum 3): </label>
-        <input type="number" id="numMiddleTowers" name="numMiddleTowers" min="3" value="3">
-        <br>
-        <label for="numBlocks">Number of Blocks (minimum 3): </label>
-        <input type="number" id="numBlocks" name="numBlocks" min="3" value="3">
-        <br><br>
-        <button id="startButton">Start Game 🎮</button>
+        <h1>Tower Puzzle Game</h1>
+        <div>
+            <label for="numMiddleTowers">Number of Middle Towers:</label>
+            <input type="number" id="numMiddleTowers" name="numMiddleTowers" min="3" value="3">
+        </div>
+        <div>
+            <label for="numBlocks">Number of Blocks:</label>
+            <input type="number" id="numBlocks" name="numBlocks" min="3" value="3">
+        </div>
+        <button id="startButton">Start Game</button>
+
+        <div id="game-description">
+            <h2>Game Description</h2>
+            <p>The Tower Puzzle Game is a two-player strategy game where each player aims to move all their blocks from their starting tower to their target tower, using intermediate towers labeled 'A', 'B', 'C', etc.</p>
+            <h3>How to Play</h3>
+            <ul>
+                <li><strong>Objective:</strong> Be the first to move all your blocks to your target tower.</li>
+                <li><strong>Setup:</strong>
+                    <ul>
+                        <li>Choose the number of middle towers (minimum of 3).</li>
+                        <li>Choose the number of blocks for each player (minimum of 3).</li>
+                        <li>Start the game to generate the towers and blocks.</li>
+                    </ul>
+                </li>
+                <li><strong>Gameplay:</strong>
+                    <ul>
+                        <li>Players take turns moving one block at a time.</li>
+                        <li>Blocks can be moved to any tower but cannot be placed on top of a smaller block.</li>
+                        <li>Use the drag-and-drop interface to move blocks.</li>
+                        <li><strong>No Repeating Positions:</strong> Players cannot make a move that results in a game state that has occurred previously. If a move would repeat a previous position, it is not allowed, and the player must choose a different move.</li>
+                    </ul>
+                </li>
+                <li><strong>Winning the Game:</strong> The first player to successfully move all their blocks to their target tower wins.</li>
+            </ul>
+            <p>Enjoy the game!</p>
+        </div>
     </div>
     <div id="game-board" style="display: none;">
         <!-- Game towers and blocks will be generated here -->
